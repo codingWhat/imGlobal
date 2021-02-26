@@ -1,0 +1,8 @@
+{
+  "wsServerAddr" : ":8089",
+  "wsServerReadBuffSize" : 1024,
+  "wsServerWriteBuffSize": 1024,
+  "httpServerAddr" :  ":8080",
+  "etcdAddr": "127.0.0.1:2379",
+  "grpcServerAddr": ":10001"
+}

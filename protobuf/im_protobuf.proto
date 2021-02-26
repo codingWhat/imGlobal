@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+
+
+option java_multiple_files = true;
+option java_package = "io.grpc.examples.protobuf";
+option java_outer_classname = "ProtobufProto";
+
+package protobuf;
+
+service AccServer {
+    rpc SendMsg(SendMsgReq) returns (SendMsgRsp) {}
+    rpc SendMsgAll(SendMsgAllReq) returns (SendMsgAllRsp) {}
+}
+
+message SendMsgReq {
+    string seq = 1; //序列号
+    uint32 appId = 2; //appId
+    string userId = 3;
+    string userName = 4;
+    string cmd = 5;
+    string type = 6;
+    string msg = 7;
+    bool isLocal = 8;
+}
+
+message SendMsgRsp {
+    uint32 retCode = 1;
+    string errMsg = 2;
+    string sendMsgId = 3;
+}
+
+message SendMsgAllReq {
+    string seq = 1;
+    uint32 appId = 2;
+    string userId = 3;
+    string userName = 4;
+    string cmd = 5;
+    string type = 6;
+    string msg = 7;
+}
+
+message SendMsgAllRsp {
+    uint32 retCode = 1;
+    string errMsg = 2;
+    string sendMsgId = 3;
+}
