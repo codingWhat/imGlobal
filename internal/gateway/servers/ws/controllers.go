@@ -9,6 +9,7 @@ import (
 	out2 "github.com/codingWhat/imGlobal/internal/gateway/data/out"
 	service2 "github.com/codingWhat/imGlobal/internal/gateway/service"
 	"github.com/codingWhat/imGlobal/protobuf"
+	"github.com/golang/protobuf/proto"
 )
 
 func WebsocketInit() {
@@ -47,7 +48,8 @@ func LoginHandler(client *Client, seq string, message []byte) (code int, msg str
 		Msg:     "欢迎加入聊天室",
 		Type: "broadcast",
 	}
-	val, _ := json.Marshal(tmpStruct)
+	//val, _ := json.Marshal(tmpStruct)
+	val, _ := proto.Marshal(&tmpStruct)
 	fmt.Println("ready to push to kafka,", string(val))
 	common.G_Mq.Push(common.PushMsg{
 		Destination: "demo",

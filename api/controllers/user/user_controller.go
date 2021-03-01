@@ -1,13 +1,13 @@
 package user
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/Shopify/sarama"
 	models2 "github.com/codingWhat/imGlobal/api/models"
 	"github.com/codingWhat/imGlobal/common"
 	"github.com/codingWhat/imGlobal/protobuf"
 	"github.com/gin-gonic/gin"
+	"github.com/golang/protobuf/proto"
 	"strconv"
 )
 
@@ -56,7 +56,7 @@ func SendMsgAll(ctx *gin.Context) {
 	}
 
 
-	tmpStruct := protobuf.SendMsgReq{
+	tmpStruct := &protobuf.SendMsgReq{
 		Seq:     msgId,
 		AppId:   uint32(iAppId),
 		UserId:  userId,
@@ -66,7 +66,8 @@ func SendMsgAll(ctx *gin.Context) {
 		IsLocal: false,
 		Type: "broadcast",
 	}
-	val, _ := json.Marshal(tmpStruct)
+	val, _ := proto.Marshal(tmpStruct)
+	//val, _ := json.Marshal(tmpStruct)
 
 	common.G_Mq.Push(common.PushMsg{
 		Destination: "demo",

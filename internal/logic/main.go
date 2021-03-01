@@ -1,13 +1,13 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/Shopify/sarama"
 	"github.com/codingWhat/imGlobal/common"
 	"github.com/codingWhat/imGlobal/internal/logic/config"
 	"github.com/codingWhat/imGlobal/internal/logic/scheduler"
 	"github.com/codingWhat/imGlobal/protobuf"
+	"github.com/golang/protobuf/proto"
 )
 
 func main() {
@@ -28,8 +28,13 @@ func main() {
 	common.G_Mq.StartPull(config.G_Config.Topic, config.G_Config.Group, func(part int32, msg *sarama.ConsumerMessage, partitionOffsetManager sarama.PartitionOffsetManager) {
 		worker := scheduler.G_scheduler.GetWorker()
 		req := &protobuf.SendMsgReq{}
-		_ = json.Unmarshal(msg.Value, req)
-
+		err := proto.Unmarshal(msg.Value, req)
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+		//_ = json.Unmarshal(msg.Value, req)
+		fmt.Println("-->logic consume:", req)
 		worker.JobChan <- &scheduler.Job{
 			Handler: req.Type,
 			Params:  req,
