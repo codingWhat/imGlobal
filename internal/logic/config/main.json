@@ -1,0 +1,5 @@
+{
+  "kafkaAddr" : "localhost:9092",
+  "topic": "demo",
+  "group" : "cuGroup"
+}
