@@ -2,7 +2,6 @@ package ws
 
 import (
 	"fmt"
-	"github.com/codingWhat/imGlobal/common"
 	"sync"
 	"time"
 )
@@ -47,7 +46,6 @@ func (cm *ClientManager) Run() {
 			fmt.Println("unregister user:", client.UserId)
 			delete(cm.Clients, client)
 			client.Close()
-			common.G_redisClient.HDel("USERLIST:101", client.UserId)
 		}
 	}
 }

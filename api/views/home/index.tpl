@@ -299,7 +299,9 @@
             $('.chat-with').animate({ scrollTop: document.body.clientHeight + 10000 + 'px' }, 80);
         }
         function addUserList(name) {
+            name = name + "(在线)"
             music = "<li id=\"" + name + "\">" + name + "</li>";
+
             $(".personnel-list-ul").append(music);
         }
         function delUserList(name) {
@@ -395,14 +397,21 @@
                     //i表示在data中的索引位置，n表示包含的信息的对象
                     $.each(data.data.userList, function(i, n) {
                         //获取对象中属性为optionsValue的值
-                        var res = n.split("-");
-                        var uid = res[0];
-                        var name = res[1];
-                        console.log("uid:", uid, ", name:", name, ", person:", person, ", userId:", userId);
+
+                        var uid = n.userId;
+                        var name = n.userName;
+                        console.log("uid:", uid, ", name:", name, ", person:", person, ", userId:", userId, n.isAlive);
                         if (name == person && uid == userId) {
-                            n = n + "(自己)"
+                            name = name + "(自己)"
                         }
-                        music += "<li id=\"" + n + "\">" + n + "</li>";
+
+                        if (uid != userId && n.isAlive) {
+                           name = name + "(在线)"
+                        } else if (uid != userId && !n.isAlive) {
+                           name = name + "(离线)"
+                        }
+
+                        music += "<li id=\"" + name + "\">" + name + "</li>";
                     });
                     $(".personnel-list-ul").append(music);
                     return false

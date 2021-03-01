@@ -3,7 +3,8 @@ package user
 import (
 	"fmt"
 	"github.com/Shopify/sarama"
-	models2 "github.com/codingWhat/imGlobal/api/models"
+	"github.com/codingWhat/imGlobal/api/data"
+	"github.com/codingWhat/imGlobal/api/models"
 	"github.com/codingWhat/imGlobal/common"
 	"github.com/codingWhat/imGlobal/protobuf"
 	"github.com/gin-gonic/gin"
@@ -15,11 +16,11 @@ func GetList(ctx *gin.Context) {
 	var (
 		appId string
 		err   error
-		ret   map[string][]string
+		ret   map[string][]data.UserLoginInfo
 	)
 
 	appId = ctx.DefaultQuery("appId", "101")
-	ret, err = models2.NewUserModel().GetRoomUsers(appId)
+	ret, err = models.NewUserModel().GetRoomUsers(appId)
 	if err != nil {
 		fmt.Println(err)
 		common.NewResponse(common.CodeSysError, err.Error(), "").Send(ctx)
@@ -49,7 +50,7 @@ func SendMsgAll(ctx *gin.Context) {
 		common.NewResponse(common.CodeSysError, err.Error(), "").Send(ctx)
 		return
 	}
-	userName, err = models2.GetUserInfo(userId)
+	userName, err = models.GetUserInfo(userId)
 	if err != nil {
 		common.NewResponse(common.CodeSysError, err.Error(), "").Send(ctx)
 		return
@@ -67,13 +68,10 @@ func SendMsgAll(ctx *gin.Context) {
 		Type: "broadcast",
 	}
 	val, _ := proto.Marshal(tmpStruct)
-	//val, _ := json.Marshal(tmpStruct)
-
 	common.G_Mq.Push(common.PushMsg{
 		Destination: "demo",
 		Value: sarama.ByteEncoder(val),
 	})
-
 
 	common.NewResponse(common.CodeSuccess, "OK", "").Send(ctx)
 }

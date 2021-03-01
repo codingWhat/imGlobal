@@ -32,7 +32,7 @@ func (us *UserService) saveUserInfo(userInfo out2.UserInfo) (ret string, err err
 
 func (us *UserService) joinRoom(userInfo out2.UserInfo) (ret bool, err error) {
 	key := common.RoomUserListRedisPrefixKey + strconv.Itoa(userInfo.AppID)
-	hSet := common.G_redisClient.HSet(key, userInfo.UserID+"-"+userInfo.UserName, time.Now().Format("2006-01-02 15:04:05"))
+	hSet := common.G_redisClient.HSet(key, userInfo.UserID, time.Now().Format("2006-01-02 15:04:05"))
 
 	return hSet.Val(), hSet.Err()
 }

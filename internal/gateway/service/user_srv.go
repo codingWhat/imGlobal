@@ -2,8 +2,8 @@ package service
 
 import (
 	"github.com/codingWhat/imGlobal/common"
-	config2 "github.com/codingWhat/imGlobal/internal/gateway/config"
-	out2 "github.com/codingWhat/imGlobal/internal/gateway/data/out"
+	"github.com/codingWhat/imGlobal/internal/gateway/config"
+	 "github.com/codingWhat/imGlobal/internal/gateway/data/out"
 	"strconv"
 	"time"
 )
@@ -15,7 +15,7 @@ func NewUserService() *UserService {
 	return &UserService{}
 }
 
-func (us *UserService) Login(userInfo out2.UserInfo) {
+func (us *UserService) Login(userInfo out.UserInfo) {
 	//保存用户信息uid-userName
 	_, _ = us.saveUserInfo(userInfo)
 	//存储用户所属grpc服务
@@ -24,21 +24,27 @@ func (us *UserService) Login(userInfo out2.UserInfo) {
 	_, _ = us.joinRoom(userInfo)
 }
 
-func (us *UserService) saveUserInfo(userInfo out2.UserInfo) (ret string, err error) {
+func (us *UserService) saveUserInfo(userInfo out.UserInfo) (ret string, err error) {
 	key := common.UserInfoRedisPrefixKey + userInfo.UserID
 	set := common.G_redisClient.Set(key, userInfo.UserName, 0*time.Second)
 	return set.Val(), set.Err()
 }
 
-func (us *UserService) joinRoom(userInfo out2.UserInfo) (ret bool, err error) {
+func (us *UserService) joinRoom(userInfo out.UserInfo) (ret bool, err error) {
 	key := common.RoomUserListRedisPrefixKey + strconv.Itoa(userInfo.AppID)
-	hSet := common.G_redisClient.HSet(key, userInfo.UserID+"-"+userInfo.UserName, time.Now().Format("2006-01-02 15:04:05"))
+	hSet := common.G_redisClient.HSet(key, userInfo.UserID, time.Now().Format("2006-01-02 15:04:05"))
 
 	return hSet.Val(), hSet.Err()
 }
 
-func (us *UserService) saveUserServerMap(userInfo out2.UserInfo) (ret string, err error) {
+func (us *UserService) LeaveRoom(appId,  prefix string) (ret int64, err error) {
+	key := common.RoomUserListRedisPrefixKey + appId
+	hDel := common.G_redisClient.HDel(key, prefix)
+	return hDel.Val(), hDel.Err()
+}
+
+func (us *UserService) saveUserServerMap(userInfo out.UserInfo) (ret string, err error) {
 	key := common.UserServerMapRedisPrefixKey + strconv.Itoa(userInfo.AppID)
-	set := common.G_redisClient.Set(key, config2.G_Config.GrpcAddr, 0*time.Second)
+	set := common.G_redisClient.Set(key, config.G_Config.GrpcAddr, 0*time.Second)
 	return set.Val(), set.Err()
 }

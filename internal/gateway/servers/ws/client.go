@@ -64,3 +64,4 @@ func (c *Client) Close() {
 
 	c.isClosed = true
 }
+

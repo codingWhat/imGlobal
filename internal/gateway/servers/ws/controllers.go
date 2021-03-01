@@ -5,21 +5,23 @@ import (
 	"fmt"
 	"github.com/Shopify/sarama"
 	"github.com/codingWhat/imGlobal/common"
-	config2 "github.com/codingWhat/imGlobal/internal/gateway/config"
-	out2 "github.com/codingWhat/imGlobal/internal/gateway/data/out"
-	service2 "github.com/codingWhat/imGlobal/internal/gateway/service"
+	"github.com/codingWhat/imGlobal/internal/gateway/config"
+	"github.com/codingWhat/imGlobal/internal/gateway/data/out"
+	"github.com/codingWhat/imGlobal/internal/gateway/service"
 	"github.com/codingWhat/imGlobal/protobuf"
 	"github.com/golang/protobuf/proto"
+	"strconv"
+	"time"
 )
 
 func WebsocketInit() {
 	Register("login", LoginHandler)
-	//Register("heartbeat",HeartbeatController)
+	Register("heartbeat", HeartbeatHandler)
 	//Register("ping", PingController)
 }
 
 func LoginHandler(client *Client, seq string, message []byte) (code int, msg string, data interface{}) {
-	var userInfo out2.UserInfo
+	var userInfo out.UserInfo
 	err := json.Unmarshal(message, &userInfo)
 	if err != nil {
 		fmt.Println("Unmarshall userInfo failed. err:", err.Error())
@@ -35,32 +37,46 @@ func LoginHandler(client *Client, seq string, message []byte) (code int, msg str
 
 	//存储用户相关信息
 	fmt.Println("start to save user login info ....")
-	service2.NewUserService().Login(userInfo)
+	service.NewUserService().Login(userInfo)
+
 	//将消息通知到网关
 	fmt.Println("LoginUserInfo", userInfo, ", ready to sent grpc, params", seq, userInfo.AppID, userInfo.UserID, userInfo.UserName)
 
 	tmpStruct := protobuf.SendMsgReq{
-		Seq:     seq,
-		AppId:   uint32(userInfo.AppID),
-		UserId:  userInfo.UserID,
+		Seq:      seq,
+		AppId:    uint32(userInfo.AppID),
+		UserId:   userInfo.UserID,
 		UserName: userInfo.UserName,
-		Cmd:     "enter",
-		Msg:     "欢迎加入聊天室",
-		Type: "broadcast",
+		Cmd:      "enter",
+		Msg:      "欢迎加入聊天室",
+		Type:     "broadcast",
 	}
-	//val, _ := json.Marshal(tmpStruct)
-	val, _ := proto.Marshal(&tmpStruct)
+
+	val, err := proto.Marshal(&tmpStruct)
+	if err != nil {
+		//todo
+		return
+	}
+
 	fmt.Println("ready to push to kafka,", string(val))
 	common.G_Mq.Push(common.PushMsg{
 		Destination: "demo",
-		Value: sarama.ByteEncoder(val),
+		Value:       sarama.ByteEncoder(val),
 	})
 
-	//grpcclient2.SendMsgAll(seq, userInfo.AppID, userInfo.UserID, userInfo.UserName, "enter", "欢迎加入聊天室")
-
-	fmt.Println("current serverAddr:", config2.G_Config.WsAddr, ", lent(clients):", len(G_clientManager.GetCurrentClients()))
+	fmt.Println("current serverAddr:", config.G_Config.WsAddr, ", lent(clients):", len(G_clientManager.GetCurrentClients()))
 	return 0, "用户登录成功", nil
 }
+
+func HeartbeatHandler(client *Client, seq string, message []byte)(code int, msg string, data interface{}) {
+
+	client.LastHeartBeat = uint64(time.Now().Unix())
+
+	key := common.RoomUserListRedisPrefixKey + strconv.Itoa(client.AppId)
+	_ = common.G_redisClient.HSet(key, client.UserId, time.Now().Format("2006-01-02 15:04:05"))
+	return
+}
+
 
 func hasLogined(userId string) bool {
 	return true

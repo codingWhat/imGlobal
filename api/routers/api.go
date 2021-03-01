@@ -29,8 +29,11 @@ func New() *gin.Engine {
 		r.POST("sendMessage", user.SendMsg)
 	}
 
+
 	router.LoadHTMLGlob("views/**/*")
+
 	router.GET("/home/index", home.Index)
+
 
 	return router
 }

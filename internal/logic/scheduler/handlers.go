@@ -26,23 +26,33 @@ func getJobHandler(handler string) Handler {
 
 
 func SendMsg(params interface{}) error {
-	ret, _ := json.Marshal(params)
+	ret, err := json.Marshal(params)
+	if err != nil {
+		return err
+	}
 	smR := &protobuf.SendMsgReq{}
-	_ = json.Unmarshal(ret, smR)
-	_ = gatecclient.SendMsg(smR.Seq, int(smR.AppId), smR.UserId, smR.Cmd, smR.Msg)
+	err = json.Unmarshal(ret, smR)
+	if err != nil {
+		return err
+	}
 
-	return nil
+	return  gatecclient.SendMsg(smR.Seq, int(smR.AppId), smR.UserId, smR.Cmd, smR.Msg)
 }
 
 func SendMsgAll(params interface{}) error  {
-	ret, _ := json.Marshal(params)
-	fmt.Println(ret)
+	ret, err := json.Marshal(params)
+	if err != nil {
+		return err
+	}
+
 	smR := protobuf.SendMsgReq{}
-	_ = json.Unmarshal(ret, &smR)
+	err = json.Unmarshal(ret, &smR)
+	if err != nil {
+		return err
+	}
 
 	fmt.Println("logic Server ready to push to gateway, params:", smR.Seq, int(smR.AppId), smR.UserId, smR.UserName, smR.Cmd, smR.Msg)
 	errs := gatecclient.SendMsgAll(smR.Seq, int(smR.AppId), smR.UserId, smR.UserName, smR.Cmd, smR.Msg)
-
 	if len(errs) == 0 {
 		return nil
 	}
