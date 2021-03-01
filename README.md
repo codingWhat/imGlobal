@@ -1,4 +1,4 @@
-goim v2.0
+imGlobal 1.0
 ==============
 
 [![Language](https://img.shields.io/badge/Language-Go-blue.svg)](https://golang.org/)
