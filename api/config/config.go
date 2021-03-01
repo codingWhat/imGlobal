@@ -13,6 +13,9 @@ type Config struct {
 	HttpAddr        string `json:"httpServerAddr"`
 	EtcdAddr        string `json:"etcdAddr"`
 	GrpcAddr        string `json:"grpcServerAddr"`
+	KafkaAddr string `json:"kafkaAddr"`
+	Topic     string    `json:"topic"`
+	Group     string    `json:"group"`
 }
 
 func NewConfig() *Config {

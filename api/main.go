@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/codingWhat/imGlobal/api/config"
+	 "github.com/codingWhat/imGlobal/api/config"
 	"github.com/codingWhat/imGlobal/api/routers"
 	"github.com/codingWhat/imGlobal/common"
 	"net/http"
@@ -15,6 +15,9 @@ func main() {
 
 	//初始化redis
 	common.InitRedis()
+
+	//初始化Mq
+	common.InitMq()
 
 	//启动http服务
 	router := routers.New()

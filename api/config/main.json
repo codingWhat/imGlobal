@@ -2,7 +2,10 @@
   "wsServerAddr" : ":8089",
   "wsServerReadBuffSize" : 1024,
   "wsServerWriteBuffSize": 1024,
-  "httpServerAddr" :  ":8080",
+  "httpServerAddr" :  ":9089",
   "etcdAddr": "127.0.0.1:2379",
-  "grpcServerAddr": ":10001"
+  "grpcServerAddr": ":10001",
+  "kafkaAddr" : "localhost:9092",
+  "topic": "demo",
+  "group" : "cuGroup"
 }

@@ -17,10 +17,10 @@ func Index(c *gin.Context) {
 	data := gin.H{
 		"title":        "聊天首页",
 		"appId":        appId,
-		"httpUrl":      "iml.server.com",
-		"webSocketUrl": "iml.server.com",
-		//"httpUrl":      "192.168.124.13:8080",
-		//"webSocketUrl": "192.168.124.13:8089",
+		//"httpUrl":      "iml.server.com",
+		//"webSocketUrl": "iml.server.com",
+		"httpUrl":      "127.0.0.1:9089",
+		"webSocketUrl": "127.0.0.1:8089",
 	}
 	c.HTML(http.StatusOK, "index.tpl", data)
 }
